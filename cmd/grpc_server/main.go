@@ -6,11 +6,12 @@ import (
 	desc "github.com/kirillmc/chat-server/pkg/chat_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"net"
 )
 
-const grpcPort = 127001
+const grpcPort = 55555
 
 type server struct {
 	desc.UnimplementedChatV1Server
@@ -23,14 +24,14 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 	}, nil
 }
 
-func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) error {
+func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
 	log.Printf("user_%d is deleted", req.GetId())
-	return nil
+	return nil, nil
 }
 
-func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) error {
+func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
 	log.Printf("message was sent at %v", req.GetTimestamp())
-	return nil
+	return nil, nil
 }
 
 func main() {
