@@ -18,6 +18,6 @@ create table messages(
 );
 
 -- +goose Down
-drop table chats;
 drop table chats_users;
 drop table messages;
+drop table chats;
