@@ -74,8 +74,8 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.
 func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
 	builderInsertMessage := sq.Insert("messages").
 		PlaceholderFormat(sq.Dollar).
-		Columns("chat_id", "from_user", "text", "timestamp").
-		Values(req.ChatId, req.From, req.Text, req.Timestamp.AsTime())
+		Columns("chat_id", "from_user", "text").
+		Values(req.ChatId, req.From, req.Text)
 	query, args, err := builderInsertMessage.ToSql()
 	if err != nil {
 		log.Fatalf("failed to build INSERT query to messages table: %v", err)
