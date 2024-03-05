@@ -48,13 +48,11 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 		Suffix("RETURNING id")
 	query, args, err := buildInsertChat.ToSql()
 	if err != nil {
-		//log.Fatalf("failed to build query: %v", err)
 		return nil, err
 	}
 	var chatID int64
 	err = s.p.QueryRow(ctx, query, args...).Scan(&chatID)
 	if err != nil {
-		//log.Fatalf("failed to insert chat: %v", err)
 		return nil, err
 	}
 
@@ -66,13 +64,11 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 	}
 	query, args, err = buildInsertUsers.ToSql()
 	if err != nil {
-		//log.Fatalf("failed to build query for chats_users: %v", err)
 		return nil, err
 	}
 	_, err = s.p.Exec(ctx, query, args...)
 	if err != nil {
 		return nil, err
-		//log.Fatalf("failed to insert chats_users in databasse: %v", err)
 	}
 	return &desc.CreateResponse{
 		Id: chatID,
@@ -83,12 +79,10 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.
 	builderDelete := sq.Delete(chatsTable).PlaceholderFormat(sq.Dollar).Where(sq.Eq{idColumn: req.GetId()})
 	query, args, err := builderDelete.ToSql()
 	if err != nil {
-		//log.Fatalf("failed to build DELETE query: %v", err)
 		return nil, err
 	}
 	_, err = s.p.Exec(ctx, query, args...)
 	if err != nil {
-		//log.Fatalf("failed to delete chat: %v", err)
 		return nil, err
 	}
 	return nil, nil
@@ -101,13 +95,11 @@ func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) 
 		Values(req.ChatId, req.From, req.Text)
 	query, args, err := builderInsertMessage.ToSql()
 	if err != nil {
-		//log.Fatalf("failed to build INSERT query to messages table: %v", err)
 		return nil, err
 	}
 	_, err = s.p.Exec(ctx, query, args...)
 	if err != nil {
 		return nil, err
-		//log.Fatalf("failed to insert new message: %v", err)
 	}
 	return nil, nil
 }
