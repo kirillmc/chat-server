@@ -2,9 +2,10 @@ package env
 
 import (
 	"errors"
-	config "github.com/kirillmc/chat-server/internal"
 	"net"
 	"os"
+
+	"github.com/kirillmc/chat-server/internal/config"
 )
 
 const (

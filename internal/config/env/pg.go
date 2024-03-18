@@ -2,8 +2,9 @@ package env
 
 import (
 	"errors"
-	config "github.com/kirillmc/chat-server/internal"
 	"os"
+
+	"github.com/kirillmc/chat-server/internal/config"
 )
 
 const dsnEnvName = "PG_DSN"
