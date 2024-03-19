@@ -50,6 +50,7 @@ func New(sig ...os.Signal) *Closer { // принимает переменное 
 			c.CloseAll() // метод вызова всех функций закрытия
 		}()
 	}
+
 	return c
 }
 

@@ -45,6 +45,7 @@ func (a *App) Run() error {
 		closer.Wait()     // блокирующий
 		// делает graceful shutdown - но не сработает при log.Fatal или os.Exit
 	}()
+
 	return a.runGRPCServer()
 }
 
@@ -61,21 +62,25 @@ func (a *App) initDeps(ctx context.Context) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
 func (a *App) initConfig(_ context.Context) error {
 	//Считываем environment variables
 	flag.Parse()
+
 	err := config.Load(configPath)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (a *App) initServiceProvider(_ context.Context) error {
 	a.serviceProvider = newServiceProvider()
+
 	return nil
 }
 
@@ -83,18 +88,22 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
 	reflection.Register(a.grpcServer) // рефлексия вкл для постмана
 	desc.RegisterChatV1Server(a.grpcServer, a.serviceProvider.UserImplementation(ctx))
+
 	return nil
 }
 
 func (a *App) runGRPCServer() error {
 	log.Printf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address())
+
 	lis, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
 	if err != nil {
 		return err
 	}
+
 	err = a.grpcServer.Serve(lis)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

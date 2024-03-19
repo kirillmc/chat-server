@@ -11,5 +11,6 @@ func (s *serv) SendMessage(ctx context.Context, req *model.Message) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

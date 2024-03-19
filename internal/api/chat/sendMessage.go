@@ -14,5 +14,6 @@ func (i *Implementation) SendMessage(ctx context.Context, req *desc.SendMessageR
 	if err != nil {
 		return nil, err
 	}
+
 	return nil, nil
 }

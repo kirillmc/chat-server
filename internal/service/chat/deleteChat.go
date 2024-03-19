@@ -7,5 +7,6 @@ func (s *serv) DeleteChat(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

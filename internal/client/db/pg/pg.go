@@ -47,6 +47,7 @@ func (p *pg) ScanAllContext(ctx context.Context, dest interface{}, q db.Query, a
 
 func (p *pg) ExecContext(ctx context.Context, q db.Query, args ...interface{}) (pgconn.CommandTag, error) {
 	logQuery(ctx, q, args...)
+
 	return p.dbc.Exec(ctx, q.QueryRaw, args...)
 }
 
@@ -72,6 +73,7 @@ func (p pg) Close() {
 
 func logQuery(ctx context.Context, q db.Query, args ...interface{}) {
 	prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
+
 	log.Println(
 		ctx,
 		fmt.Sprintf("sql: %s", q.Name),

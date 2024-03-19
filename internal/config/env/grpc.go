@@ -23,6 +23,7 @@ func NewGRPCConfig() (config.GRPCConfig, error) {
 	if len(host) == 0 {
 		return nil, errors.New("grpc host not found")
 	}
+
 	port := os.Getenv(grpcPortEnvName)
 	if len(port) == 0 {
 		return nil, errors.New("grpc port not found")

@@ -11,5 +11,6 @@ func (s *serv) CreateChat(ctx context.Context, req *model.Chat) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	return id, nil
 }
