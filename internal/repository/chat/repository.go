@@ -57,29 +57,32 @@ func (r *repo) CreateChat(ctx context.Context, req *model.Chat) (int64, error) {
 		return 0, err
 	}
 
+	return chatID, nil
+}
+
+func (r *repo) AddUser(ctx context.Context, userName string, chatId int64) error {
 	buildInsertUsers := sq.Insert(chatsUsersTable).
 		PlaceholderFormat(sq.Dollar).
 		Columns(chatIdColumn, userNameColumn)
 
-	for _, elem := range req.Usernames {
-		buildInsertUsers = buildInsertUsers.Values(chatID, elem)
-	}
+	buildInsertUsers = buildInsertUsers.Values(chatId, userName)
 
-	query, args, err = buildInsertUsers.ToSql()
-	q = db.Query{
+	query, args, err := buildInsertUsers.ToSql()
+
+	q := db.Query{
 		Name:     "chat_repository.AddUsersToNewChat",
 		QueryRaw: query,
 	}
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	_, err = r.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return chatID, nil
+	return nil
 }
 
 func (r *repo) DeleteChat(ctx context.Context, id int64) error {
