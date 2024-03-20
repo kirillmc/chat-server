@@ -2,8 +2,9 @@ package env
 
 import (
 	"errors"
-	config "github.com/kirillmc/chat-server/internal"
 	"os"
+
+	"github.com/kirillmc/chat-server/internal/config"
 )
 
 const dsnEnvName = "PG_DSN"
@@ -17,6 +18,7 @@ func NewPGConfig() (config.PGConfig, error) {
 	if len(dsn) == 0 {
 		return nil, errors.New("pg dsn not found")
 	}
+
 	return &pgConfig{
 		dsn: dsn,
 	}, nil
