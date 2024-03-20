@@ -60,12 +60,13 @@ func (r *repo) CreateChat(ctx context.Context, req *model.Chat) (int64, error) {
 	return chatID, nil
 }
 
-func (r *repo) AddUser(ctx context.Context, userName string, chatId int64) error {
+func (r *repo) AddUsers(ctx context.Context, userNames []string, chatId int64) error {
 	buildInsertUsers := sq.Insert(chatsUsersTable).
 		PlaceholderFormat(sq.Dollar).
 		Columns(chatIdColumn, userNameColumn)
-
-	buildInsertUsers = buildInsertUsers.Values(chatId, userName)
+	for _, userName := range userNames {
+		buildInsertUsers = buildInsertUsers.Values(chatId, userName)
+	}
 
 	query, args, err := buildInsertUsers.ToSql()
 
