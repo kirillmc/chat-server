@@ -43,3 +43,6 @@ local-migration-up:
 
 local-migration-down:
 	$(LOCAL_BIN)/goose.exe -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
+
+create_mocks:
+	go generate ./...
