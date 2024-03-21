@@ -5,15 +5,15 @@ import (
 	"log"
 
 	"github.com/kirillmc/chat-server/internal/api/chat"
-	"github.com/kirillmc/chat-server/internal/client/db"
-	"github.com/kirillmc/chat-server/internal/client/db/pg"
-	"github.com/kirillmc/chat-server/internal/closer"
 	"github.com/kirillmc/chat-server/internal/config"
 	"github.com/kirillmc/chat-server/internal/config/env"
 	"github.com/kirillmc/chat-server/internal/repository"
 	chatRepo "github.com/kirillmc/chat-server/internal/repository/chat"
 	"github.com/kirillmc/chat-server/internal/service"
 	chatService "github.com/kirillmc/chat-server/internal/service/chat"
+	"github.com/kirillmc/platform_common/pkg/closer"
+	"github.com/kirillmc/platform_common/pkg/db"
+	"github.com/kirillmc/platform_common/pkg/db/pg"
 )
 
 // содержит все зависимости, необходимые в рамках приложения

@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/kirillmc/chat-server/internal/closer"
 	"github.com/kirillmc/chat-server/internal/config"
 	desc "github.com/kirillmc/chat-server/pkg/chat_v1"
+	"github.com/kirillmc/platform_common/pkg/closer"
 )
 
 var configPath string

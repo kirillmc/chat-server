@@ -4,9 +4,9 @@ import (
 	"context"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/kirillmc/chat-server/internal/client/db"
 	"github.com/kirillmc/chat-server/internal/model"
 	"github.com/kirillmc/chat-server/internal/repository"
+	"github.com/kirillmc/platform_common/pkg/db"
 )
 
 const (
