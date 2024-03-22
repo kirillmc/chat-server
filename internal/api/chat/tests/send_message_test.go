@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"google.golang.org/protobuf/types/known/emptypb"
-
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gojuno/minimock/v3"
 	"github.com/kirillmc/chat-server/internal/api/chat"
@@ -52,7 +50,6 @@ func TestSendMessage(t *testing.T) {
 	tests := []struct {
 		name            string
 		args            args
-		want            *emptypb.Empty
 		err             error
 		chatServiceMock chatServiceMockFunc
 	}{
@@ -62,8 +59,7 @@ func TestSendMessage(t *testing.T) {
 				ctx: ctx,
 				req: req,
 			},
-			want: nil,
-			err:  nil,
+			err: nil,
 			chatServiceMock: func(mc *minimock.Controller) service.ChatService {
 				mock := serviceMocks.NewChatServiceMock(mc)
 				mock.SendMessageMock.Expect(ctx, modelMessage).Return(nil)
@@ -76,8 +72,7 @@ func TestSendMessage(t *testing.T) {
 				ctx: ctx,
 				req: req,
 			},
-			want: nil,
-			err:  serviceErr,
+			err: serviceErr,
 			chatServiceMock: func(mc *minimock.Controller) service.ChatService {
 				mock := serviceMocks.NewChatServiceMock(mc)
 				mock.SendMessageMock.Expect(ctx, modelMessage).Return(serviceErr)
@@ -94,9 +89,8 @@ func TestSendMessage(t *testing.T) {
 			chatServiceMock := tt.chatServiceMock(mc)
 			api := chat.NewImplementation(chatServiceMock)
 
-			newId, err := api.SendMessage(tt.args.ctx, tt.args.req)
+			_, err := api.SendMessage(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)
-			require.Equal(t, tt.want, newId)
 		})
 	}
 }

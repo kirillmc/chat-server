@@ -27,22 +27,36 @@ generate-chat-api:
 	mkdir -p pkg/chat_v1
 	protoc --proto_path api/chat_v1 \
 	--go_out=pkg/chat_v1 --go_opt=paths=source_relative \
-	--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go.exe \
+	--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go \
 	--go-grpc_out=pkg/chat_v1 --go-grpc_opt=paths=source_relative \
-	--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc.exe \
+	--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 	api/chat_v1/chat.proto
 
 local-migration-status:
-	$(LOCAL_BIN)/goose.exe -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
 
 create-migration:
-	${LOCAL_BIN}/goose.exe -dir ${LOCAL_MIGRATION_DIR}  create chats_tables sql
+	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR}  create chats_tables sql
 
 local-migration-up:
-	$(LOCAL_BIN)/goose.exe -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
 
 local-migration-down:
-	$(LOCAL_BIN)/goose.exe -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
 
 create_mocks:
 	go generate ./...
+
+test:
+	go clean -testcache
+	go test ./... -covermode count -coverpkg=github.com/kirillmc/chat-server/internal/service/...,github.com/kirillmc/chat-server/internal/api/...
+
+
+test_coverage:
+	go clean -testcache
+	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=github.com/kirillmc/chat-server/internal/service/...,github.com/kirillmc/chat-server/internal/api/... -count 5
+	grep -v 'mocks\|config' coverage.tmp.out  > coverage.out
+	rm coverage.tmp.out
+	go tool cover -html=coverage.out;
+	go tool cover -func=./coverage.out | grep "total";
+	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore

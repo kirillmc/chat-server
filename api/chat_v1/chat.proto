@@ -3,7 +3,6 @@ syntax = "proto3";
 package chat_v1;
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package ="github.com/kirillmc/chat-server/pkg/chat_v1;chat_v1";
 
