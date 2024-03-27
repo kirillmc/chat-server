@@ -49,7 +49,7 @@ create_mocks:
 
 test:
 	go clean -testcache
-	go test ./... -covermode count -coverpkg=github.com/kirillmc/chat-server/internal/service/...,github.com/kirillmc/chat-server/internal/api/...
+	go test ./... -covermode count -coverpkg=/internal/service/...,$(CURDIR)/internal/api/...
 
 
 test_coverage:
