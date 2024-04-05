@@ -92,3 +92,11 @@ vendor-proto:
 			mv vendor.protogen/openapiv2/protoc-gen-openapiv2/options/*.proto vendor.protogen/protoc-gen-openapiv2/options &&\
 			rm -rf vendor.protogen/openapiv2 ;\
 		fi
+
+gen-cert:
+	openssl genrsa -out tls/ca.key 4096
+	openssl req -new -x509 -key tls/ca.key -sha256 -subj "/C=US/ST=NJ/O=CA, Inc." -days 365 -out tls/ca.cert
+	openssl genrsa -out tls/service.key 4096
+	openssl req -new -key tls/service.key -out tls/service.csr -config tls/certificate.conf
+	openssl x509 -req -in tls/service.csr -CA tls/ca.cert -CAkey tls/ca.key -CAcreateserial \
+    		-out tls/service.pem -days 365 -sha256 -extfile tls/certificate.conf -extensions req_ext
