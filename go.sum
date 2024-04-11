@@ -110,10 +110,13 @@ github.com/jinzhu/now v1.1.1/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/
 github.com/jmoiron/sqlx v1.3.1/go.mod h1:2BljVx/86SuTyjE+aPYlHCTNvZrnJXghYGpNiXLBMCQ=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/kirillmc/auth v0.0.0-20240411112245-bca0391c5f66 h1:P6Oj0bDFBvD6e1FDbNuNMAGTCLyKXJfM3TCM9NX5ogg=
+github.com/kirillmc/auth v0.0.0-20240411112245-bca0391c5f66/go.mod h1:70e6MquN4rlYVjssRs8FK+uu0a0pjOPIbhEbMdx0PAg=
 github.com/kirillmc/platform_common v0.0.0-20240321141600-feb5e99bb008 h1:ehYSJH0+tB7RyKET1CCVQYAATaxm0GpSMkZaYL5nVGc=
 github.com/kirillmc/platform_common v0.0.0-20240321141600-feb5e99bb008/go.mod h1:s+4Dn6Z5rjLlrUy5Um1e4KWDhwlBhzqn5vCMYZTOZsU=
 github.com/kirillmc/platform_common v0.0.0-20240404115054-9c0949737b4a h1:9FoB6vAWmecvA7YqeO8NIWYNiGraNOWTAOu9UYXWhLY=
 github.com/kirillmc/platform_common v0.0.0-20240404115054-9c0949737b4a/go.mod h1:vyCtbJYyR5tW8UU7JHEoaZO/TUkXffNj8GAWBrOPrM4=
+github.com/kirillmc/platform_common v0.0.0-20240409070039-be2988157a23/go.mod h1:vyCtbJYyR5tW8UU7JHEoaZO/TUkXffNj8GAWBrOPrM4=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
