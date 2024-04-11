@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
 	descAccess "github.com/kirillmc/auth/pkg/access_v1"
@@ -18,6 +18,7 @@ var accessToken = flag.String("a", "", "access token")
 const (
 	servicePort = 50051
 	ExamplePath = "/user_v1.UserV1/Get"
+	SERVICE_PEM = "tls/client/service.pem"
 )
 
 func main() {
@@ -27,9 +28,15 @@ func main() {
 	md := metadata.New(map[string]string{"Authorization": "Bearer " + *accessToken})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
+	creds, err := credentials.NewClientTLSFromFile(SERVICE_PEM, "")
+	if err != nil {
+		log.Fatalf("FAILED TO GET CREDS: %v\n", err)
+	}
+
 	conn, err := grpc.Dial(
 		fmt.Sprintf(":%d", servicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithTransportCredentials(creds),
+		//grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		log.Fatalf("failed to dial GRPC client: %v", err)
