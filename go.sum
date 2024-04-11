@@ -116,6 +116,7 @@ github.com/kirillmc/platform_common v0.0.0-20240321141600-feb5e99bb008 h1:ehYSJH
 github.com/kirillmc/platform_common v0.0.0-20240321141600-feb5e99bb008/go.mod h1:s+4Dn6Z5rjLlrUy5Um1e4KWDhwlBhzqn5vCMYZTOZsU=
 github.com/kirillmc/platform_common v0.0.0-20240404115054-9c0949737b4a h1:9FoB6vAWmecvA7YqeO8NIWYNiGraNOWTAOu9UYXWhLY=
 github.com/kirillmc/platform_common v0.0.0-20240404115054-9c0949737b4a/go.mod h1:vyCtbJYyR5tW8UU7JHEoaZO/TUkXffNj8GAWBrOPrM4=
+github.com/kirillmc/platform_common v0.0.0-20240409070039-be2988157a23 h1:Ku05wBRD5WgM2QN6s444rFfV+nDqha85rjycZOQIn0U=
 github.com/kirillmc/platform_common v0.0.0-20240409070039-be2988157a23/go.mod h1:vyCtbJYyR5tW8UU7JHEoaZO/TUkXffNj8GAWBrOPrM4=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
