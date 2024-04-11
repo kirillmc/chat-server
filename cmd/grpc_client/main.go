@@ -14,18 +14,21 @@ import (
 )
 
 var accessToken = flag.String("a", "", "access token")
+var examplePath = flag.String("ex", "", "example path")
 
 const (
-	servicePort = 50051
-	ExamplePath = "/user_v1.UserV1/Get"
-	SERVICE_PEM = "tls/client/service.pem"
+	servicePort   = 50051
+	ExamplePath   = "/user_v1.UserV1/Get"
+	SERVICE_PEM   = "tls/client/service.pem"
+	AUTHORIZATION = "Authorization"
+	REARER        = "Bearer "
 )
 
 func main() {
 	flag.Parse()
 
 	ctx := context.Background()
-	md := metadata.New(map[string]string{"Authorization": "Bearer " + *accessToken})
+	md := metadata.New(map[string]string{AUTHORIZATION: REARER + *accessToken})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
 	creds, err := credentials.NewClientTLSFromFile(SERVICE_PEM, "")
@@ -45,7 +48,7 @@ func main() {
 	cl := descAccess.NewAccessV1Client(conn)
 
 	_, err = cl.Check(ctx, &descAccess.CheckRequest{
-		EndpointAddress: ExamplePath,
+		EndpointAddress: *examplePath,
 	})
 	if err != nil {
 		log.Fatal(err.Error())
@@ -53,3 +56,7 @@ func main() {
 
 	fmt.Println("Access granted")
 }
+
+/** For tests:
+go run cmd/grpc_client/main.go -a "" -ex "/user_v1.UserV1/Get"
+*/

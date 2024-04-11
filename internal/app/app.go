@@ -25,8 +25,9 @@ import (
 )
 
 const (
-	SERVICE_PEM = "tls/service.pem"
-	SERVICE_KEY = "tls/service.key"
+	SERVICE_PEM        = "tls/service.pem"
+	SERVICE_KEY        = "tls/service.key"
+	CLIENT_SERVICE_PEM = "tls/client/service.pem"
 )
 
 var configPath string
