@@ -145,8 +145,6 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(creds),
 		grpc.ChainUnaryInterceptor(c.PolicyInterceptor, interceptor.ValidateInerceptor),
-		//grpc.UnaryInterceptor(c.PolicyInterceptor),
-		//grpc.UnaryInterceptor(interceptor.ValidateInerceptor),
 	)
 
 	reflection.Register(a.grpcServer) // рефлексия вкл для постмана
