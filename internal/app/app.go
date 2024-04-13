@@ -141,9 +141,12 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		log.Fatalf("Failed to load TLS keys %v", err)
 	}
 
+	c := a.serviceProvider.InterceptorClient()
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(creds),
-		grpc.UnaryInterceptor(interceptor.ValidateInerceptor),
+		grpc.ChainUnaryInterceptor(c.PolicyInterceptor, interceptor.ValidateInerceptor),
+		//grpc.UnaryInterceptor(c.PolicyInterceptor),
+		//grpc.UnaryInterceptor(interceptor.ValidateInerceptor),
 	)
 
 	reflection.Register(a.grpcServer) // рефлексия вкл для постмана

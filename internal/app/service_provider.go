@@ -4,9 +4,16 @@ import (
 	"context"
 	"log"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+
+	descAccess "github.com/kirillmc/auth/pkg/access_v1"
 	"github.com/kirillmc/chat-server/internal/api/chat"
+	"github.com/kirillmc/chat-server/internal/client/rpc"
+	"github.com/kirillmc/chat-server/internal/client/rpc/access"
 	"github.com/kirillmc/chat-server/internal/config"
 	"github.com/kirillmc/chat-server/internal/config/env"
+	"github.com/kirillmc/chat-server/internal/interceptor"
 	"github.com/kirillmc/chat-server/internal/repository"
 	chatRepo "github.com/kirillmc/chat-server/internal/repository/chat"
 	"github.com/kirillmc/chat-server/internal/service"
@@ -22,8 +29,11 @@ type serviceProvider struct {
 	grpcConfig    config.GRPCConfig
 	httpConfig    config.HTTPConfig
 	swaggerConfig config.SwaggerConfig
+	accesConfig   config.AccessConfig
 
-	dbClient db.Client
+	accessClient      rpc.AccessClient
+	dbClient          db.Client
+	interceptorClient *interceptor.Client
 
 	chatRepository repository.ChatRepository
 	chatService    service.ChatService
@@ -88,6 +98,51 @@ func (s *serviceProvider) SwaggerConfig() config.SwaggerConfig {
 	}
 
 	return s.swaggerConfig
+}
+
+func (s *serviceProvider) AccessConfig() config.AccessConfig {
+	if s.accesConfig == nil {
+		cfg, err := env.NewAccessConfig()
+		if err != nil {
+			log.Fatalf("failed to get acces configs: %v", err)
+		}
+
+		s.accesConfig = cfg
+	}
+
+	return s.accesConfig
+}
+
+func (s *serviceProvider) AccessClient() rpc.AccessClient {
+	if s.accessClient == nil {
+		cfg := s.AccessConfig()
+		creds, err := credentials.NewClientTLSFromFile(cfg.CertPath(), "")
+		if err != nil {
+			log.Fatalf("failed to get credentials of access: %v", err)
+		}
+
+		conn, err := grpc.Dial(
+			cfg.Address(),
+			grpc.WithTransportCredentials(creds),
+		)
+		if err != nil {
+			log.Fatalf("failed to connect to access: %v", err)
+		}
+
+		s.accessClient = access.NewAccessClient(descAccess.NewAccessV1Client(conn))
+	}
+
+	return s.accessClient
+}
+
+func (s *serviceProvider) InterceptorClient() *interceptor.Client {
+	if s.interceptorClient == nil {
+		s.interceptorClient = &interceptor.Client{
+			Client: s.AccessClient(),
+		}
+	}
+
+	return s.interceptorClient
 }
 
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
