@@ -10,17 +10,17 @@ import (
 	"github.com/kirillmc/chat-server/internal/client/rpc"
 )
 
-type Client struct {
-	Client rpc.AccessClient
+type Interceptor struct {
+	client rpc.AccessClient
 }
 
-func (c *Client) PolicyInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (i *Interceptor) PolicyInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, errors.New("metadate is not provided")
+		return nil, errors.New("metadata is not provided")
 	}
 
-	err := c.Client.Check(metadata.NewOutgoingContext(ctx, md), info.FullMethod)
+	err := i.client.Check(metadata.NewOutgoingContext(ctx, md), info.FullMethod)
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ type serviceProvider struct {
 
 	accessClient      rpc.AccessClient
 	dbClient          db.Client
-	interceptorClient *interceptor.Client
+	interceptorClient *interceptor.Interceptor
 
 	chatRepository repository.ChatRepository
 	chatService    service.ChatService
@@ -135,10 +135,10 @@ func (s *serviceProvider) AccessClient() rpc.AccessClient {
 	return s.accessClient
 }
 
-func (s *serviceProvider) InterceptorClient() *interceptor.Client {
+func (s *serviceProvider) InterceptorClient() *interceptor.Interceptor {
 	if s.interceptorClient == nil {
-		s.interceptorClient = &interceptor.Client{
-			Client: s.AccessClient(),
+		s.interceptorClient = &interceptor.Interceptor{
+			client: s.AccessClient(),
 		}
 	}
 
