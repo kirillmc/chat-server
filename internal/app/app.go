@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -17,20 +18,23 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/kirillmc/chat-server/internal/config"
 	localInterceptor "github.com/kirillmc/chat-server/internal/interceptor"
+	"github.com/kirillmc/chat-server/internal/metric"
+	rateLimiter "github.com/kirillmc/chat-server/internal/rate_limiter"
 	"github.com/kirillmc/chat-server/internal/tracing"
 	desc "github.com/kirillmc/chat-server/pkg/chat_v1"
 	_ "github.com/kirillmc/chat-server/statik"
 	"github.com/kirillmc/platform_common/pkg/closer"
 	"github.com/kirillmc/platform_common/pkg/interceptor"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
+	"github.com/sony/gobreaker"
 )
 
 const (
-	SERVICE_PEM        = "tls/service.pem"
-	SERVICE_KEY        = "tls/service.key"
-	CLIENT_SERVICE_PEM = "tls/client/service.pem"
-	serviceName        = "chat-server-service"
+	SERVICE_PEM = "tls/service.pem"
+	SERVICE_KEY = "tls/service.key"
+	serviceName = "chat-server-service"
 )
 
 var configPath string
@@ -42,10 +46,11 @@ func init() {
 // подвязываем инициализаторские штуки из service_provider к старту приложения
 
 type App struct {
-	serviceProvider *serviceProvider
-	grpcServer      *grpc.Server
-	httpServer      *http.Server
-	swaggerServer   *http.Server
+	serviceProvider  *serviceProvider
+	grpcServer       *grpc.Server
+	httpServer       *http.Server
+	swaggerServer    *http.Server
+	prometheusServer *http.Server
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -67,7 +72,7 @@ func (a *App) Run() error {
 	}()
 
 	wg := sync.WaitGroup{}
-	wg.Add(3)
+	wg.Add(4)
 
 	go func() {
 		defer wg.Done()
@@ -84,6 +89,15 @@ func (a *App) Run() error {
 		err := a.runHTTPServer()
 		if err != nil {
 			log.Fatalf("failed to run http server: %v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		err := a.runPrometheusServer()
+		if err != nil {
+			log.Fatalf("failed to run prometheus server: %v", err)
 		}
 	}()
 
@@ -107,6 +121,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initServiceProvider,
 		a.initGRPCServer,
 		a.initHTTPServer,
+		a.initPrometheusServer,
 		a.initSwaggerServer,
 	}
 
@@ -146,13 +161,31 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	tracing.Init(serviceName)
 
+	cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
+		Name:        "my-service",
+		MaxRequests: 10,
+		Timeout:     5 * time.Second,
+		ReadyToTrip: func(counts gobreaker.Counts) bool {
+			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+			return failureRatio >= 0.6
+		},
+		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
+			log.Printf("Circuit Breaker: %s, changed from %v, to %v\n", name, from, to)
+		},
+	})
+
+	rateLimiter := rateLimiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+
 	c := a.serviceProvider.InterceptorClient()
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(creds),
 		grpc.ChainUnaryInterceptor(
+			localInterceptor.NewCircuitBreakerInterceptor(cb).Unary,
 			localInterceptor.ServerTracingInterceptor,
-			c.PolicyInterceptor,
+			localInterceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
+			localInterceptor.MetricsInterceptor,
 			interceptor.ValidateInerceptor,
+			c.PolicyInterceptor,
 		),
 	)
 
@@ -185,6 +218,23 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	a.httpServer = &http.Server{
 		Addr:    a.serviceProvider.HTTPConfig().Address(),
 		Handler: corsMiddleware.Handler(mux),
+	}
+
+	return nil
+}
+
+func (a *App) initPrometheusServer(ctx context.Context) error {
+	err := metric.Init(ctx)
+	if err != nil {
+		log.Fatalf("failed to init metrics: %v", err)
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	a.prometheusServer = &http.Server{
+		Addr:    a.serviceProvider.PrometheusConfig().Address(),
+		Handler: mux,
 	}
 
 	return nil
@@ -228,6 +278,17 @@ func (a *App) runHTTPServer() error {
 	log.Printf("HTTP server is running on %s", a.serviceProvider.HTTPConfig().Address())
 
 	err := a.httpServer.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) runPrometheusServer() error {
+	log.Printf("Prometheus server is running on: %s", a.serviceProvider.PrometheusConfig().Address())
+
+	err := a.prometheusServer.ListenAndServe()
 	if err != nil {
 		return err
 	}

@@ -105,3 +105,17 @@ gen-cert:
 	openssl req -new -key tls/service.key -out tls/service.csr -config tls/certificate.conf
 	openssl x509 -req -in tls/service.csr -CA tls/ca.cert -CAkey tls/ca.key -CAcreateserial \
     		-out tls/service.pem -days 365 -sha256 -extfile tls/certificate.conf -extensions req_ext
+
+
+grpc-load-test:
+	ghz \
+		--proto api/chat_v1/chat.proto \
+		--import-paths=vendor.protogen/ \
+		--call chat_v1.ChatV1.Create \
+		-m '{"authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTY3Mjg5MTUsInVzZXJuYW1lIjoiYSIsInJvbGUiOjJ9.sn1PQLdvIBUxdR2_nsKMNPtGoplGxsIvVUCSao3XPP4"}'\
+		--data '{"usernames": ["test"]}' \
+		--rps 100 \
+		--total 3000 \
+		--cacert=tls/service.pem \
+        --key=tls/service.key \
+		localhost:55555

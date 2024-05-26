@@ -107,20 +107,20 @@
         },
         "parameters": [
           {
-            "name": "chatId",
+            "name": "message.chatId",
             "in": "query",
             "required": false,
             "type": "string",
             "format": "int64"
           },
           {
-            "name": "from",
+            "name": "message.from",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "text",
+            "name": "message.text",
             "in": "query",
             "required": false,
             "type": "string"
@@ -133,6 +133,14 @@
     }
   },
   "definitions": {
+    "chat_v1ConnectResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/chat_v1Message"
+        }
+      }
+    },
     "chat_v1CreateRequest": {
       "type": "object",
       "properties": {
@@ -150,6 +158,21 @@
         "id": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "chat_v1Message": {
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "from": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
         }
       }
     },

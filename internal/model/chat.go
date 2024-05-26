@@ -9,3 +9,8 @@ type Message struct {
 	UserFrom string
 	Text     string
 }
+
+type UserChatConnection struct {
+	ChatId   int64
+	UserName string
+}

@@ -27,11 +27,12 @@ import (
 
 // содержит все зависимости, необходимые в рамках приложения
 type serviceProvider struct {
-	pgConfig      config.PGConfig
-	grpcConfig    config.GRPCConfig
-	httpConfig    config.HTTPConfig
-	swaggerConfig config.SwaggerConfig
-	accesConfig   config.AccessConfig
+	pgConfig         config.PGConfig
+	grpcConfig       config.GRPCConfig
+	httpConfig       config.HTTPConfig
+	prometheusConfig config.PrometheusConfig
+	swaggerConfig    config.SwaggerConfig
+	accesConfig      config.AccessConfig
 
 	accessClient      rpc.AccessClient
 	dbClient          db.Client
@@ -87,6 +88,19 @@ func (s *serviceProvider) HTTPConfig() config.HTTPConfig {
 	}
 
 	return s.httpConfig
+}
+
+func (s *serviceProvider) PrometheusConfig() config.PrometheusConfig {
+	if s.prometheusConfig == nil {
+		prometheusConfig, err := env.NewPrometheusConfig()
+		if err != nil {
+			log.Fatalf("failed to get prometheusConfig config: %v", err)
+		}
+
+		s.prometheusConfig = prometheusConfig
+	}
+
+	return s.prometheusConfig
 }
 
 func (s *serviceProvider) SwaggerConfig() config.SwaggerConfig {

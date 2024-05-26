@@ -45,6 +45,8 @@ service ChatV1{
       post:"/chat/v1/send_message"
     };
   }
+
+  rpc Connect(ConnectRequest) returns(stream ConnectResponse);
 }
 
 message CreateRequest{
@@ -59,7 +61,20 @@ message DeleteRequest{
   int64 id = 1;
 }
 
+message ConnectRequest{
+  int64 id = 1;
+  string username = 2;
+}
+
 message SendMessageRequest{
+  Message message = 1;
+}
+
+message ConnectResponse{
+  Message message = 1;
+}
+
+message Message{
   int64 chat_id =1;
   string from = 2[(validate.rules).string = {min_len:1,max_len:50}];
   string text = 3[(validate.rules).string.min_len=1];

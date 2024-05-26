@@ -13,8 +13,15 @@ func ToChatFromCreateRequest(chat *desc.CreateRequest) *model.Chat {
 
 func ToMessageFromSendMessageRequest(message *desc.SendMessageRequest) *model.Message {
 	return &model.Message{
-		ChatId:   message.ChatId,
-		UserFrom: message.From,
-		Text:     message.Text,
+		ChatId:   message.Message.ChatId,
+		UserFrom: message.Message.From,
+		Text:     message.Message.Text,
+	}
+}
+
+func ToUserChatConnectionFromConnectRequest(connectReq *desc.ConnectRequest) *model.UserChatConnection {
+	return &model.UserChatConnection{
+		ChatId:   connectReq.Id,
+		UserName: connectReq.Username,
 	}
 }
