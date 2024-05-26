@@ -14,6 +14,11 @@ lint:
 get-deps:
 	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
 	go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+	go get -u github.com/opentracing/opentracing-go
+	go get -u github.com/uber/jaeger-client-go
+	go get -u github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc
+
+
 
 install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1

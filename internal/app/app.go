@@ -16,6 +16,8 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/kirillmc/chat-server/internal/config"
+	localInterceptor "github.com/kirillmc/chat-server/internal/interceptor"
+	"github.com/kirillmc/chat-server/internal/tracing"
 	desc "github.com/kirillmc/chat-server/pkg/chat_v1"
 	_ "github.com/kirillmc/chat-server/statik"
 	"github.com/kirillmc/platform_common/pkg/closer"
@@ -28,6 +30,7 @@ const (
 	SERVICE_PEM        = "tls/service.pem"
 	SERVICE_KEY        = "tls/service.key"
 	CLIENT_SERVICE_PEM = "tls/client/service.pem"
+	serviceName        = "chat-server-service"
 )
 
 var configPath string
@@ -141,10 +144,16 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		log.Fatalf("Failed to load TLS keys %v", err)
 	}
 
+	tracing.Init(serviceName)
+
 	c := a.serviceProvider.InterceptorClient()
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(creds),
-		grpc.ChainUnaryInterceptor(c.PolicyInterceptor, interceptor.ValidateInerceptor),
+		grpc.ChainUnaryInterceptor(
+			localInterceptor.ServerTracingInterceptor,
+			c.PolicyInterceptor,
+			interceptor.ValidateInerceptor,
+		),
 	)
 
 	reflection.Register(a.grpcServer) // рефлексия вкл для постмана

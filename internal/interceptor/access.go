@@ -8,10 +8,11 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/kirillmc/chat-server/internal/client/rpc"
+	"github.com/opentracing/opentracing-go"
 )
 
 type Interceptor struct {
-	client rpc.AccessClient
+	Client rpc.AccessClient
 }
 
 func (i *Interceptor) PolicyInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -20,10 +21,12 @@ func (i *Interceptor) PolicyInterceptor(ctx context.Context, req interface{}, in
 		return nil, errors.New("metadata is not provided")
 	}
 
-	err := i.client.Check(metadata.NewOutgoingContext(ctx, md), info.FullMethod)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "check")
+	defer span.Finish()
+
+	err := i.Client.Check(metadata.NewOutgoingContext(ctx, md), info.FullMethod)
 	if err != nil {
 		return nil, err
 	}
-
 	return handler(ctx, req)
 }

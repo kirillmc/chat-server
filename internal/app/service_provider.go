@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	descAccess "github.com/kirillmc/auth/pkg/access_v1"
 	"github.com/kirillmc/chat-server/internal/api/chat"
 	"github.com/kirillmc/chat-server/internal/client/rpc"
@@ -21,6 +22,7 @@ import (
 	"github.com/kirillmc/platform_common/pkg/closer"
 	"github.com/kirillmc/platform_common/pkg/db"
 	"github.com/kirillmc/platform_common/pkg/db/pg"
+	"github.com/opentracing/opentracing-go"
 )
 
 // содержит все зависимости, необходимые в рамках приложения
@@ -124,6 +126,7 @@ func (s *serviceProvider) AccessClient() rpc.AccessClient {
 		conn, err := grpc.Dial(
 			cfg.Address(),
 			grpc.WithTransportCredentials(creds),
+			grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
 		)
 		if err != nil {
 			log.Fatalf("failed to connect to access: %v", err)
@@ -138,7 +141,7 @@ func (s *serviceProvider) AccessClient() rpc.AccessClient {
 func (s *serviceProvider) InterceptorClient() *interceptor.Interceptor {
 	if s.interceptorClient == nil {
 		s.interceptorClient = &interceptor.Interceptor{
-			client: s.AccessClient(),
+			Client: s.AccessClient(),
 		}
 	}
 
